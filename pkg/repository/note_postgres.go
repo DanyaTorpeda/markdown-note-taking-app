@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	mdnote "markdown-note"
 
@@ -25,4 +27,23 @@ func (r *NotePostgres) Create(input mdnote.Note) (int, error) {
 	}
 
 	return id, nil
+}
+
+func (r *NotePostgres) GetById(id int) (*mdnote.Note, error) {
+	queryGetNote := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", notesTable)
+	var note mdnote.Note
+	err := r.db.Get(&note, queryGetNote, id)
+	if err != nil {
+		return nil, err
+	}
+
+	queryGetAttachments := fmt.Sprintf("SELECT * FROM %s WHERE note_id = $1", attachmentsTable)
+	var attachments []mdnote.Attachment
+	err = r.db.Select(&attachments, queryGetAttachments, id)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	note.Attachments = attachments
+	return &note, nil
 }

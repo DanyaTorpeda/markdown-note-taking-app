@@ -17,9 +17,13 @@ func NewHandler(service *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	notes := router.Group("/notes")
+	api := router.Group("/api")
+	notes := api.Group("/notes")
 	{
 		notes.POST("/", h.createNote)
+		notes.GET("/:id", h.getById)
+		notes.POST("/:id/attachments", h.createAttachments)
+		notes.GET("/:id/uploads/:file_name", h.getAttachment)
 	}
 	return router
 }
