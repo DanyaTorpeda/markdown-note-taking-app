@@ -64,3 +64,25 @@ func (h *Handler) getById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, note)
 }
+
+func (h *Handler) deleteNote(c *gin.Context) {
+	val := c.Param("id")
+	if val == "" {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id data")
+		return
+	}
+
+	id, err := strconv.Atoi(val)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.service.Note.Delete(id)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}

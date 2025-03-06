@@ -47,3 +47,22 @@ func (r *NotePostgres) GetById(id int) (*mdnote.Note, error) {
 	note.Attachments = attachments
 	return &note, nil
 }
+
+func (r *NotePostgres) Delete(id int) error {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1", notesTable)
+	res, err := r.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("nothing was deleted")
+	}
+
+	return nil
+}
