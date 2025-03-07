@@ -13,6 +13,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+//TODO make error handling
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		logrus.Errorf("error occured loading env variables: %s", err.Error())

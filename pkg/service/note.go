@@ -29,6 +29,13 @@ func (s *NoteService) GetById(id int) (*mdnote.Note, error) {
 	return s.repo.GetById(id)
 }
 
+func (s *NoteService) Update(id int, input mdnote.Note) error {
+	if input.Title == "" && input.Content == "" {
+		return errors.New("empty note body")
+	}
+	return s.repo.Update(id, input)
+}
+
 func (s *NoteService) Delete(id int) error {
 	dirPath, err := filepath.Abs(fmt.Sprintf("uploads/%d", id))
 	if err != nil {

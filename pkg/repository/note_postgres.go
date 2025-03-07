@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	mdnote "markdown-note"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -46,6 +47,49 @@ func (r *NotePostgres) GetById(id int) (*mdnote.Note, error) {
 
 	note.Attachments = attachments
 	return &note, nil
+}
+
+func (r *NotePostgres) Update(id int, input mdnote.Note) error {
+	var placeholders []string
+	var args []interface{}
+	indexId := 1
+
+	if input.Title != "" {
+		placeholders = append(placeholders, fmt.Sprintf("title = $%d", indexId))
+		args = append(args, input.Title)
+		indexId++
+	}
+
+	if input.Content != "" {
+		placeholders = append(placeholders, fmt.Sprintf("content = $%d", indexId))
+		args = append(args, input.Content)
+		indexId++
+	}
+
+	placeholders = append(placeholders, fmt.Sprintf("updated_at = $%d", indexId))
+	args = append(args, "now()")
+	indexId++
+
+	params := strings.Join(placeholders, ", ")
+
+	updateQuery := fmt.Sprintf("UPDATE %s SET %s WHERE id = $%d", notesTable, params, indexId)
+	args = append(args, id)
+
+	res, err := r.db.Exec(updateQuery, args...)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("nothing updated")
+	}
+
+	return nil
 }
 
 func (r *NotePostgres) Delete(id int) error {
