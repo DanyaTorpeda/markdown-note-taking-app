@@ -15,6 +15,7 @@ type Note interface {
 
 type Attachment interface {
 	Create(noteId int, attachments []mdnote.Attachment) error
+	Delete(noteId int, fileId int) (string, error)
 }
 
 type Repository struct {

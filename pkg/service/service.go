@@ -15,6 +15,7 @@ type Note interface {
 
 type Attachment interface {
 	Create(noteId int, headers []*multipart.FileHeader) error
+	Delete(noteId int, fileId int) error
 }
 
 type Service struct {

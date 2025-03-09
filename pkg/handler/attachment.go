@@ -53,3 +53,37 @@ func (h *Handler) getAttachment(c *gin.Context) {
 	}
 	c.File(absPath)
 }
+
+func (h *Handler) deleteAttachment(c *gin.Context) {
+	val := c.Param("id")
+	if val == "" {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id data")
+		return
+	}
+
+	noteId, err := strconv.Atoi(val)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	val = c.Param("file_id")
+	if val == "" {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id data")
+		return
+	}
+
+	fileId, err := strconv.Atoi(val)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = h.service.Attachment.Delete(noteId, fileId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}

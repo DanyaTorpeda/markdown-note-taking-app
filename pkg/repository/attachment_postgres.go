@@ -35,3 +35,15 @@ func (r *AttachmentPostgres) Create(noteId int, attachments []mdnote.Attachment)
 	_, err := r.db.Exec(query, values...)
 	return err
 }
+
+func (r *AttachmentPostgres) Delete(noteId int, fileId int) (string, error) {
+	query := fmt.Sprintf("DELETE FROM %s WHERE id = $1 AND note_id = $2 RETURNING file_name", attachmentsTable)
+	row := r.db.QueryRow(query, fileId, noteId)
+	var fileName string
+	err := row.Scan(&fileName)
+	if err != nil {
+		return "", err
+	}
+
+	return fileName, nil
+}

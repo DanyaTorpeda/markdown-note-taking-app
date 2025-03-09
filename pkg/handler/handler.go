@@ -25,6 +25,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		notes.PUT("/:id", h.updateNote)
 		notes.DELETE("/:id", h.deleteNote)
 		notes.POST("/:id/attachments", h.createAttachments)
+		notes.DELETE("/:id/attachments/:file_id", h.deleteAttachment)
 		notes.GET("/:id/uploads/:file_name", h.getAttachment)
 		notes.GET("/:id/render", h.parsingHTML)
 	}

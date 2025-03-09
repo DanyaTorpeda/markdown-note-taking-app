@@ -54,3 +54,22 @@ func (s *AttachmentService) Create(noteId int, headers []*multipart.FileHeader) 
 
 	return s.repo.Create(noteId, attachments)
 }
+
+func (s *AttachmentService) Delete(noteId int, fileId int) error {
+	fileName, err := s.repo.Delete(noteId, fileId)
+	if err != nil {
+		return err
+	}
+
+	filePath, err := filepath.Abs(fmt.Sprintf("uploads/%d/%s", noteId, fileName))
+	if err != nil {
+		return err
+	}
+
+	err = os.Remove(filePath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
